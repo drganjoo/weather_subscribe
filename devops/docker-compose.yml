@@ -1,0 +1,21 @@
+version: "3.2"
+services:
+  apidb:
+    image: postgres:14.1
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: apiadmin
+      POSTGRES_PASSWORD: passw0rd
+      POSTGRES_DB: weather_api
+    volumes:
+      - database-data:/var/lib/postgresql/data/
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+volumes:
+  database-data: 
