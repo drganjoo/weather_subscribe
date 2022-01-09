@@ -19,5 +19,5 @@ def register_commands(app : Flask):
     @app.cli.command("init-db")
     def init_db():
         """Creates a new database"""
-        from .models import subscriber, subscription
+        from . import models
         Base.metadata.create_all(bind=engine)

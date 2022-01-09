@@ -1,8 +1,8 @@
+import flask
 import typing as t
 from werkzeug.exceptions import HTTPException
 from .database import db_session
 from .exceptions import ApiException, MissingFieldsException
-import flask
 from .commontypes import FormField, FormFieldList
 
 def register_pre_post(app: flask.Flask):
@@ -48,20 +48,21 @@ def register_pre_post(app: flask.Flask):
     @app.errorhandler(Exception)
     def handle_exception(e : Exception):
         """Convert exception into a proper JSON format"""
-        return { "error": {
-                    "code": e.code,
-                    "description": str(e)
+        return { 
+            "error": {
+                "code": ApiException.unknown_error,
+                "description": str(e)
             }
-        }
+        }, 501
 
     @app.after_request
     def add_headers(resp : flask.Response) -> flask.Response:
         resp.headers['X-Api-Ver'] = '1.0'
         return resp
 
-def get_fields(request : flask.request, fields: FormFieldList):
+def get_fields(request : flask.request, fields: FormFieldList) -> t.List[str]:
     missing_fields : t.List[FormField] = []
-    field_values : t.Dict[str, str] = {}
+    field_values : t.List[str] = []
 
     form_input_values : t.Optional[t.Any] = request.get_json(force=True)
 
@@ -71,13 +72,15 @@ def get_fields(request : flask.request, fields: FormFieldList):
     f : FormField
     for f in fields:
         # raise an exception in case the field is required but not present in the form
-        if f.name not in form_input_values and f.is_required:
-            missing_fields.append(f)
+        if f.name not in form_input_values:
+            if f.is_required:
+                missing_fields.append(f)
+            else:
+                field_values.append(None)
         else:
-            field_values[f.name] = form_input_values[f.name]
+            field_values.append(form_input_values[f.name])
             
     if len(missing_fields) > 0:
         raise MissingFieldsException(missing_fields)
 
-    print(field_values)
     return field_values
