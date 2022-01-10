@@ -3,6 +3,8 @@ import datetime
 import threading
 
 class Logger:
+    """A simple logger that outputs to the conole. Elastic or some other service should be 
+    built on top of this to make useful logging"""
     # just some ID that can be used to uniquely identify critical errors on the 
     # server
     id = round(datetime.datetime.now().timestamp())
@@ -11,6 +13,9 @@ class Logger:
     def __init__(self, module : str):
         self.module = module
     
+    def info(self, msg: str):
+        self.log('i', msg)
+
     def warn(self, msg: str):
         self.log('e', msg)
 

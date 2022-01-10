@@ -1,10 +1,18 @@
+import sys
 import typing as t
 from flask import Flask
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from .app import app
 
-engine = create_engine('postgresql://apiadmin:passw0rd@localhost/weather_api')
+# figure out the URI from the app object
+uri : str = app.config['DATABASE_URI']
+if uri is None:
+    print('DATABASE_URI is not set in app config')
+    sys.exit(-1)
+
+engine = create_engine(uri)
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
                                          bind=engine))

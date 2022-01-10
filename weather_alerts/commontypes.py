@@ -1,5 +1,6 @@
 import typing as t
 
+"""Just some common fields that are used in the API """
 class FormField(t.NamedTuple):
     name: str
     desc: str

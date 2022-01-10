@@ -4,7 +4,9 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import UniqueConstraint
 from weather_alerts.database import Base
 
+"""Database related model classes are defined here"""
 class Subscriber(Base):
+    """Represents a subscriber in the system"""
     __tablename__ = 'subscribers'
     
     id = Column(Integer, primary_key = True, nullable = False)
@@ -12,7 +14,7 @@ class Subscriber(Base):
 
     subscriptions = relationship('Subscription', back_populates='subscriber')
     
-    def __init__(self, email):
+    def __init__(self, email: str):
         self.email = email
 
     def __repr__(self):
@@ -20,6 +22,7 @@ class Subscriber(Base):
 
 
 class Subscription(Base):
+    """Represents a subscription to a city's weather by a subscriber"""
     __tablename__ = 'subscriptions'
     
     id = Column(Integer, primary_key = True, nullable = False)
@@ -32,7 +35,7 @@ class Subscription(Base):
 
     subscriber = relationship('Subscriber', back_populates=('subscriptions'))
 
-    def __init__(self, subscriber_id, city, min_temperature):
+    def __init__(self, subscriber_id : int, city: str, min_temperature: float):
         self.subscriber_id = subscriber_id
         self.city = city
         self.min_temperature = min_temperature

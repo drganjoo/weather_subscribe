@@ -1,0 +1,48 @@
+@contentType = application/json
+@hostname = localhost:5000
+@baseUrl = http://{{hostname}}
+
+############
+# @name index
+GET {{baseUrl}}/
+
+############
+# @name health
+GET {{baseUrl}}/health
+
+############
+# @name register
+POST {{baseUrl}}/weather/subscribe
+Content-Type: application/json
+
+{
+    "email": "fahadzubair@gmail.com",
+    "city": "Birmingham",
+    "minTemperature": 20
+}
+
+
+############
+# @name delete
+DELETE {{baseUrl}}/weather/subscribe
+Content-Type: application/json
+
+{
+    "email": "fahadzubair@gmail.com",
+    "city": "London"
+}
+
+############
+# @name update
+PUT {{baseUrl}}/weather/subscribe
+Content-Type: application/json
+
+{
+    "email": "fahadzubair@gmail.com",
+    "city": "London",
+    "minTemperature": 0
+}
+
+############
+# @name list
+GET {{baseUrl}}/weather/list?email=fahadzubair@gmail.com
