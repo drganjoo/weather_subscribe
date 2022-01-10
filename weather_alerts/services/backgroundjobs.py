@@ -1,8 +1,9 @@
+import sys
 import typing as t
 from apscheduler.schedulers.background import BackgroundScheduler
 from weather_alerts.services.alertservice import AlertService
 from ..services.subscriptionservice import ActiveSubscription, CityAlert, SubscriptionService
-from ..services.weatherservice import CityWeather, WeatherException, WeatherServiceCache
+from ..services.weatherservice import CityWeather, WeatherException, WeatherServiceCache, WeatherService
 from ..logger import Logger
 
 log = Logger(__name__)
@@ -56,5 +57,10 @@ def alert_job():
 sched = BackgroundScheduler(daemon=True)
 
 def setup_jobs(interval_seconds : int = 60) -> None:
+    service = WeatherService()
+    if service.api_key == '':
+        print(f'background_jobs.setup_jobs() failed. Please write api key either in instance/config.py or app.py directly')
+        sys.exit(-1)
+        
     # todo: check to make sure job is not inserted twice
     sched.add_job(alert_job, 'interval', seconds = interval_seconds)

@@ -12,10 +12,15 @@ if uri is None:
     print('DATABASE_URI is not set in app config')
     sys.exit(-1)
 
-engine = create_engine(uri)
-db_session = scoped_session(sessionmaker(autocommit=False,
+print(f'Using database uri: {uri}')
+try:
+    engine = create_engine(uri)
+    db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
                                          bind=engine))
+except Exception as e:
+    print('Error occurred connecting to the database. Error: {e}')
+    sys.exit(-2)
 
 Base = declarative_base()
 Base.query = db_session.query_property()
