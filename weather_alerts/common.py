@@ -1,9 +1,13 @@
 import flask
 import typing as t
 from werkzeug.exceptions import HTTPException
+from .logger import Logger
 from .database import db_session
-from .exceptions import ApiException, MissingFieldsException
-from .commontypes import FormField, FormFieldList
+from .exceptions import ApiException, MissingFieldsException, StorageException
+from .commontypes import FormField, FormFieldList, FormFieldValues
+from sqlalchemy.exc import DatabaseError
+
+log = Logger(__name__)
 
 def register_pre_post(app: flask.Flask):
     # todo: check how to close the connection
@@ -25,11 +29,13 @@ def register_pre_post(app: flask.Flask):
     @app.errorhandler(MissingFieldsException)
     def handle_missing_fields(e : MissingFieldsException):
         """Return a list of all missing fields"""
-        json_dict = handle_api_exception(e)
-        json_dict.error["fields"] = [f.name for f in e.fields]
+        (json_dict, status_code) = handle_api_exception(e)
+        error : t.Dict[str, str] = json_dict["error"]
 
-        return json_dict
+        f : FormField
+        error["fields"] = [f.name for f in e.fields]
 
+        return json_dict, status_code
 
     @app.errorhandler(HTTPException)
     def handle_exception(e : HTTPException):
@@ -44,6 +50,11 @@ def register_pre_post(app: flask.Flask):
         response.content_type = "application/json"
 
         return response, e.code
+
+    @app.errorhandler(DatabaseError)
+    def handle_exception(e : DatabaseError):
+        support_id = log.error(str(e))
+        raise StorageException(support_id)
 
     @app.errorhandler(Exception)
     def handle_exception(e : Exception):

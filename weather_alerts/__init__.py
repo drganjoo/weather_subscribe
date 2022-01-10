@@ -3,8 +3,10 @@
 # has an email address, a location (e.g. city) and some simple weather conditions to 
 # be alerted about, (e.g. temperature less than 0 celsius).
 from flask import Flask
+
+from .routes import health, weather
 from .database import db_session, register_commands
-from . import weather, common, health
+from . import common
 
 app = Flask(__name__, instance_relative_config = True)
 

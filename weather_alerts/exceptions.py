@@ -1,11 +1,12 @@
 import typing as t
-from werkzeug.exceptions import UnprocessableEntity, Conflict
+from werkzeug.exceptions import UnprocessableEntity, Conflict, Gone
 from .commontypes import FormField
 
 class ApiException(Exception):
     missing_fields = 'missing_fields'
     already_exists = 'already_exists'
     storage_error = 'storage_error'
+    not_found = 'not_found'
     unknown_error = 'unknown_error'
 
     def __init__(self, status_code : int, error_code : str, description : str):
@@ -22,6 +23,10 @@ class MissingFieldsException(ApiException):
 class AlreadyExistsException(ApiException):
     def __init__(self, description : str):
         super().__init__(Conflict.code, ApiException.already_exists, description)
+
+class NotFoundException(ApiException):
+    def __init__(self, description : str):
+        super().__init__(Gone.code, ApiException.not_found, description)
 
 class StorageException(ApiException):
     def __init__(self, support_id : int):
