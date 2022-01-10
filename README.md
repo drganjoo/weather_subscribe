@@ -10,6 +10,10 @@ The app should regularly poll a public weather API for the city locations that h
 
 ## How to run
 
+### API Key for Weather API Service
+
+Write the API key in instance/config.py. If there is no instance/config.py then write it to the default file weather_alerts/config.py (the system copies this over  to instance folder on startup) OR app.py directly
+
 ### Python Version Required
 
 ```
