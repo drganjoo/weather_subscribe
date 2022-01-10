@@ -10,6 +10,12 @@ The app should regularly poll a public weather API for the city locations that h
 
 ## How to run
 
+### Python Version Required
+
+```
+python=3.9
+```
+
 ### Install python modules
 
 ```
@@ -39,6 +45,12 @@ export FLASK_ENV=production
 flask run
 ```
 
+*Note: some warning will be shown but these are in the package APScheduler. Since in production this 
+is not recommended to be used at all, these warnings have not been removed*
+
+### Configuration
+
+A separate config.py can be created and it will be loaded by 
 ## Datbase Tables
 
 ### Subscriber
@@ -155,6 +167,8 @@ can connect, one that monitors alerts and the other that handles notifications.
 `tests` folder has `api.rest` file that can be used with VSCode Rest client to be tested manually
 
 ### Automated Test Cases
+
+**Tests** have not been completed but just a few had been written to give a sample.
 
 ```
     pytest tests/test_service.py

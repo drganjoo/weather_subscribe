@@ -16,40 +16,43 @@ def alert_job():
     is below the minimum temperature"""
     log.info('Alert job running')
 
-    service = SubscriptionService()
-    cities : t.List[str] = service.get_cities()
+    try:
+        service = SubscriptionService()
+        cities : t.List[str] = service.get_cities()
 
-    weather_service = WeatherServiceCache()
+        weather_service = WeatherServiceCache()
 
-    # update cache for any city that has stale weather
-    for city_alert in cities:
-        if weather_service.is_stale(city_alert):
-            try:
-                weather_service.update_weather(city_alert)
-            except WeatherException as e:
-                log.error(f'{city_alert} is not valid. error: {e}')
+        # update cache for any city that has stale weather
+        for city_alert in cities:
+            if weather_service.is_stale(city_alert):
+                try:
+                    weather_service.update_weather(city_alert)
+                except WeatherException as e:
+                    log.error(f'{city_alert} is not valid. error: {e}')
 
-    alert_service = AlertService()
-    subscribers : t.List[ActiveSubscription] = service.get_all()
+        alert_service = AlertService()
+        subscribers : t.List[ActiveSubscription] = service.get_all()
 
-    # go over all subscribers' subscriptions, combine all of the 
-    # alerted ones and then tell the notifier to issue notification
-    for sub in subscribers:
-        # cities that are alarmed for this subscriber
-        alarmed : t.List[CityAlert] = []
+        # go over all subscribers' subscriptions, combine all of the 
+        # alerted ones and then tell the notifier to issue notification
+        for sub in subscribers:
+            # cities that are alarmed for this subscriber
+            alarmed : t.List[CityAlert] = []
 
-        # go over all subscribed cities  and add them to alarmed in case
-        # their temperature is < the alert temperature
-        for city_alert in sub.subscriptions:
-            city_weather : t.Optional[CityWeather] = weather_service.get_weather(city_alert)
-            if city_weather and city_weather.temperature < city_alert.min_temperature:
-                alarmed.append(city_alert)
+            # go over all subscribed cities  and add them to alarmed in case
+            # their temperature is < the alert temperature
+            for city_alert in sub.subscriptions:
+                city_weather : t.Optional[CityWeather] = weather_service.get_weather(city_alert)
+                if city_weather and city_weather.temperature < city_alert.min_temperature:
+                    alarmed.append(city_alert)
 
-        # send an alert in case one city is alarmed
-        if len(alarmed) > 0:
-            alert_service.notify(sub.email, alarmed)
+            # send an alert in case one city is alarmed
+            if len(alarmed) > 0:
+                alert_service.notify(sub.email, alarmed)
 
-
+    except Exception as e:
+        log.error(f'An error occurred in background job. {e}')
+        
 sched = BackgroundScheduler(daemon=True)
 
 def setup_jobs(interval_seconds : int = 60) -> None:
