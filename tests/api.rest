@@ -45,4 +45,4 @@ Content-Type: application/json
 
 ############
 # @name list
-GET {{baseUrl}}/weather/list?email=fahadzubair@gmail.com
+GET {{baseUrl}}/weather/list?email=fahadzubair@gmawil.com
